@@ -1,0 +1,22 @@
+参考内容：
+1.博客
+    [1]http://www.cnblogs.com/homewch/p/5704153.html
+    [2]http://blog.sciencenet.cn/blog-247792-793360.html
+    [3]http://www.bijishequ.com/detail/48094
+    [4]http://www.cnblogs.com/miningbw/p/6946027.html
+    [5]http://blog.csdn.net/einstellung/article/details/76228099
+    [6]http://www.cnblogs.com/aloiswei/p/6150480.html
+    [7]https://ask.hellobi.com/blog/louwill12/8634
+    [8]http://whuhan2013.github.io/blog/2015/09/19/markdown-simple-grammar/
+2.网站
+    [1]https://stackoverflow.com/questions/36868287/purl-within-knit-duplicate-label-error
+    [2]http://www.rpubs.com/lihaoyi/156592
+    [3]http://col.dog/2015/11/22/Markdown-Syntax/
+    [4]file:///C:/Users/Administrator/Desktop/AMZ/EDA/diamondsExample_2016-05.html
+3.文档
+    [1]http://personality-project.org/r/psych/HowTo/factor.pdf
+    [2]http://www.bagualu.net/resources/r_markdown.pdf
+4.Github
+    [1]https://github.com/yihui/knitr/issues/443
+    [2]https://github.com/yihui/knitr-examples/blob/master/062-chunk-wrapper.Rmd
+    [3]https://github.com/yixuan/prettydoc
