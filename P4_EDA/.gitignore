@@ -1,4 +1,4 @@
-*.RData
-*.Rhistory
-*.ignore
+# R workspace
+.RData
+.Rhistory
 
