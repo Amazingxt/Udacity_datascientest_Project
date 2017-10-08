@@ -8,6 +8,11 @@ output:
 ---
 ========================================================
 
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, echo = FALSE)
+
+```
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
 # Load all of the packages that you end up using
 # in your analysis in this code chunk.
@@ -74,6 +79,8 @@ ggplot(aes(x = quality), data = wine) +
   geom_histogram(binwidth = 1)
 ```
 </div>
+
+明显看到柱状图中的binwidth太大，适当减小该参数
 
 <div style="text-align:center">
 ```{r echo=FALSE, Univariate_Plots-5}
@@ -213,8 +220,25 @@ ggplot(aes(x = chlorides), data = wine) +
 ```
 </div>
 
+酸甜比也是衡量葡萄酒口感的一个很重的因素，创建酸甜比变量
+
+```{r echo=FALSE, Univariate_Plots-51}
+wine$sugar_acid = wine$acid / wine$residual.sugar
+```
+查看其分布情况
+
 <div style="text-align:center">
 ```{r echo=FALSE, Univariate_Plots-23}
+ggplot(aes(x = sugar_acid), data = wine) +
+  geom_histogram(binwidth = 0.01) +
+  scale_x_log10()
+```
+</div>
+
+可以很明显的看出在1和5两个地方有峰值的存在
+
+<div style="text-align:center">
+```{r echo=FALSE, Univariate_Plots-52}
 ggplot(aes(x = chlorides), data = wine) +
   geom_histogram(binwidth = 0.01) +
   scale_x_log10()
@@ -298,6 +322,8 @@ ggplot(aes(x = sulphates), data = wine) +
 summary(wine$sulphates)
 ```
 
+硫酸盐的分布大体是正态分布，大部分的数值在0.41-0.55之间
+
 <div style="text-align:center">
 ```{r echo=FALSE, Univariate_Plots-36}
 ggplot(aes(x = alcohol), data = wine) +
@@ -308,6 +334,8 @@ ggplot(aes(x = alcohol), data = wine) +
 ```{r echo=FALSE, Univariate_Plots-37}
 summary(wine$alcohol)
 ```
+
+白葡萄酒中的酒精含量应该是一个很重要的指标，其分布是一个随酒精含量升高数量缓慢减小的分布
 
 # Univariate Analysis
 
@@ -357,13 +385,6 @@ pairs.panels(wine, pch = '.')
 首先来探索与酒的质量相关性比较大的两个变量酒精含量和密度
 
 <div style="text-align:center">
-```{r echo=FALSE, Bivariate_Plots-3}
-ggplot(aes(x = alcohol, y = quality), data = wine) +
-  geom_point()
-```
-</div>
-
-<div style="text-align:center">
 ```{r echo=FALSE, Bivariate_Plots-4}
 ggplot(aes(x = alcohol, y = quality), data = wine) +
   geom_jitter(alpha = 0.1) +
@@ -371,37 +392,31 @@ ggplot(aes(x = alcohol, y = quality), data = wine) +
 ```
 </div>
 
-酒精含量和酒的质量并不是线性相关的，但可以大体看出在质量比较高的酒中，酒精含量比较高的占的比重要大一些
+大体可以看出酒精含量与酒的质量是成正相关的关系，不过看起来不是很明显，我们将x轴与y轴进行互换，并画出箱线图
+
+<div style="text-align:center">
+```{r echo=FALSE, Multivariate_Plots-4}
+wine$quality = factor(wine$quality)
+ggplot(wine,aes(quality, alcohol)) + 
+geom_jitter(alpha=0.3) +
+geom_boxplot( alpha = 0.5,color = 'blue')+
+stat_summary(fun.y = "mean", 
+      geom = "point", 
+      color = "red")+
+geom_smooth(method='lm', aes(group = 1))+
+  ggtitle('红酒质量和酒精浓度关系图') +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+</div>
+
+这下可以看出酒精含量和酒的质量并不是线性相关的，但很明显在质量比较高的酒中，酒精含量比较高的占的比重要大一些
 
 ```{r echo=FALSE, Bivariate_Plots-5}
 m1 = lm(quality ~ alcohol, data = wine)
 m1
 ```
 
-<div style="text-align:center">
-```{r echo=FALSE, Bivariate_Plots-6}
-ggplot(aes(x = density, y = quality), data = wine) +
-  geom_point()
-```
-</div>
-
-只取密度的前百分之一的值
-
-<div style="text-align:center">
-```{r echo=FALSE, Bivariate_Plots-7}
-ggplot(aes(x = density, y = quality), 
-       data = subset(wine, wine$density < quantile(wine$density, 0.99))) +
-  geom_point()
-```
-</div>
-
-<div style="text-align:center">
-```{r echo=FALSE, Bivariate_Plots-8}
-ggplot(aes(x = density, y = quality), 
-       data = subset(wine, wine$density < quantile(wine$density, 0.99))) +
-  geom_jitter(alpha = 0.1)
-```
-</div>
+在单变量处理阶段，我们看到密度这一变量有异常值的存在，因此我们抛弃密度的后百分之一的值，画出箱线图
 
 以酒的质量的数值对数据进行分组
 
@@ -489,11 +504,10 @@ ggplot(aes(x = free.sulfur.dioxide / total.sulfur.dioxide), data = wine) +
 
 <div style="text-align:center">
 ```{r echo=FALSE, Bivariate_Plots-17}
-newpalette<-colorRampPalette(brewer.pal(9,"Blues"))(7)
 wine$quality = factor(wine$quality)
 ggplot(aes(x = quality, y = free.sulfur.dioxide / total.sulfur.dioxide), 
        data = wine) +
-  geom_boxplot(col=brewer.pal(7,"Set3")) 
+  geom_boxplot() 
 ```
 </div>
 
@@ -533,13 +547,15 @@ cor(wine)
 <div style="text-align:center">
 ```{r echo=FALSE, Multivariate_Plots-1}
 wine$quality = factor(wine$quality)
-ggplot(aes(x = density, y = alcohol), data = subset(wine, wine$density < quantile(wine$density, 0.9))) +
-  geom_point(aes(color = quality), size = 3) +
-  scale_color_brewer(type = 'qua',
-                     guide = guide_legend(title = 'quality', reverse = TRUE,
-                                          override.aes = list(alpha = 1, size = 2)))
+ggplot(aes(x = density, y = alcohol, color = factor(quality)),
+       data = subset(wine, wine$density < quantile(wine$density, 0.9))) +
+  geom_jitter(alpha = 0.2) +
+  scale_color_brewer(palette = 'Blues') +
+  geom_smooth(method = 'lm', se = FALSE, size = 1)
 ```
 </div>
+
+图中显示了不同quality的白葡萄酒，其酒精含量和密度的关系。可以看到对于所有质量的葡萄酒，密度和酒精含量几乎都是呈现出反相关的关系
 
 <div style="text-align:center">
 ```{r echo=FALSE, Multivariate_Plots-2}
@@ -576,29 +592,19 @@ grid.arrange(plot1, plot2, plot3, plot4, plot5, plot6, plot7, ncol = 3)
 ```
 </div>
 
+图中显示了不同quality的葡萄酒，其酸性物质的含量和pH的关系，可以看到对于所有quality的酒，其酸性物质的含量与pH都是呈现出反相关的关系，并且在quality为5、6、7的地方，两者的方差要大一些
+
 <div style="text-align:center">
 ```{r echo=FALSE, Multivariate_Plots-3}
 ggplot(aes(x= fixed.acidity, y= volatile.acidity), data = wine) +
-  geom_point(aes(color = quality))+
+  geom_point()+
   facet_wrap(~quality)+
   ggtitle('红酒质量与挥发酸及非挥发酸之间相关关系图') +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 </div>
 
-<div style="text-align:center">
-```{r echo=FALSE, Multivariate_Plots-4}
-ggplot(wine,aes(quality, alcohol)) + 
-geom_jitter(alpha=0.3) +
-geom_boxplot( alpha = 0.5,color = 'blue')+
-stat_summary(fun.y = "mean", 
-      geom = "point", 
-      color = "red")+
-geom_smooth(method='lm', aes(group = 1))+
-  ggtitle('红酒质量和酒精浓度关系图') +
-  theme(plot.title = element_text(hjust = 0.5))
-```
-</div>
+图中画出了对于不同quality的酒其挥发性酸与非挥发性酸的关系，在图中并不能明显看出两种酸性物质的明确关系
 
 ```{r echo=FALSE, Multivariate_Plots-5}
 wine$quality = as.numeric(wine$quality)
